@@ -18,3 +18,4 @@ ALPHABETS = ['A', 'B', 'C', 'D',
             'U', 'V', 'W', 'X',
             'Y', 'Z']
 MODEL_NAME = 'resnet18_CrossEntropy_SGD_'
+SAVE_CSV = False

@@ -1,23 +1,20 @@
-import pandas as pd
-import numpy as np
-import cv2
 import torch
 import torch.nn as nn
 from torchvision import transforms
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
 import os, glob
 import torchvision
 from sklearn.model_selection import train_test_split
-from PIL import Image
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 import warnings, argparse
+import datetime, pytz
 
 import config
 from utils import *
 from dataset import ASL_dataset
-warnings.filterwarnings(action = "ignore")
 
+warnings.filterwarnings(action = "ignore")
+tz_ist = pytz.timezone("Asia/Kolkata")
 
 
 if __name__ == "__main__":
@@ -48,8 +45,13 @@ if __name__ == "__main__":
     iterable_path = os.path.join(base_dir, "**")
     data_paths = glob.glob(os.path.join(iterable_path, "*" + ext))
 
+    print(
+        f'{datetime.datetime.now(tz_ist).strftime("%Y-%m-%d %H:%M:%S")}--[INFO]: Started making the dataframe'
+    )
+
     df = make_df(data_paths)
-    # df.to_csv(os.path.join(save_path, "data.csv"), index = False)
+    if config.SAVE_CSV == True:
+        df.to_csv(os.path.join(base_dir, "data.csv"), index = False)
 
     img_transform = transforms.Compose([transforms.ToTensor(),
                                         transforms.Normalize([0.485, 0.456, 0.406],
@@ -69,6 +71,10 @@ if __name__ == "__main__":
     model = model.to(device)
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=config.LEARNING_RATE, momentum = config.MOMENTUM, nesterov = True)
+
+    print(
+        f'{datetime.datetime.now(tz_ist).strftime("%Y-%m-%d %H:%M:%S")}--[INFO]: Model initialised... started training'
+    )
 
     for epoch in range(config.EPOCHS):
         print('Epoch {}/{}, lr:{}'.format(epoch + 1,
