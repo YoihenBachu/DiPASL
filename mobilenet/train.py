@@ -77,6 +77,7 @@ if __name__ == "__main__":
     )
 
     for epoch in range(config.EPOCHS):
+        e+=1
         print('Epoch {}/{}, lr:{}'.format(epoch + 1,
             config.EPOCHS, optimizer.param_groups[0]['lr']))
         print('-' * 30)
