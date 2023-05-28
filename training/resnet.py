@@ -2,12 +2,14 @@ import torch
 import torch.nn as nn
 from torchvision import transforms
 from torch.utils.data import DataLoader
-import os, glob
 import torchvision
 from sklearn.model_selection import train_test_split
+
+import os, glob
 from tqdm import tqdm
 import warnings, argparse
 import datetime, pytz
+import wandb
 
 import config
 from utils import *
@@ -19,6 +21,9 @@ tz_ist = pytz.timezone("Asia/Kolkata")
 
 if __name__ == "__main__":
     e = 0
+
+    if config.WANDB_SAVE == True:
+        wandb.init(project = config.WANDB_INIT)
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -65,7 +70,7 @@ if __name__ == "__main__":
     trainloader = DataLoader(trainset, batch_size = config.BATCH_SIZE, drop_last = True, shuffle = True)
     testloader = DataLoader(testset, batch_size = config.BATCH_SIZE)
 
-    model = torchvision.models.mobilenet_v2(pretrained=True)
+    model = torchvision.models.resnet18(weights=torchvision.models.ResNet18_Weights.IMAGENET1K_V1)
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, config.NUM_CLASS)
     model = model.to(device)
@@ -131,8 +136,24 @@ if __name__ == "__main__":
         test_loss = test_loss / len(testloader)
 
         filename = config.MODEL_NAME + str(epoch+1) + '.pt'
-        if (e)%5 == 0:
-            torch.save(model.state_dict(), os.path.join(model_savepath, str(filename)))
+        if config.WANDB_INIT == True:
+            if (e)%5 == 0:
+                torch.save(model.state_dict(), os.path.join(model_savepath, str(filename)))
+                wandb.alert(
+                    title = 'Update',
+                    text = f'Epoch: {epoch+1}\nTraining Loss: {train_loss} \nValidation Loss: {test_loss} \nAccuracy: {train_acc} \nModel saved at {filename}',
+                )
+            else:
+                wandb.alert(
+                    title = 'Update',
+                    text = f'Epoch: {epoch+1}\nTraining Loss: {train_loss} \nValidation Loss: {test_loss} \nAccuracy: {train_acc}',
+            )
+            wandb.finish()
+
+        else:
+            if (e)%5 == 0:
+                torch.save(model.state_dict(), os.path.join(model_savepath, str(filename)))
+                
         # Print the training and testing statistics
         print('Epoch [{}/{}], Train Loss: {:.4f}, Train Acc: {:.2f}%, Test Loss: {:.4f}, Test Acc: {:.2f}%'
             .format(epoch+1, config.EPOCHS, train_loss, train_acc, test_loss, test_acc))

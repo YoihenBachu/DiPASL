@@ -3,6 +3,7 @@ import cv2
 from PIL import Image
 
 from utils import onehotencoder
+import config
 import warnings
 
 warnings.filterwarnings(action = "ignore")
@@ -20,8 +21,10 @@ class ASL_dataset(Dataset):
         image = cv2.imread(img_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image = Image.fromarray(image)
-        label = self.data.iloc[idx, 1]
-        label0 = onehotencoder(label)
+
+        letter = self.data.iloc[idx, 1]
+        index = config.ALPHABETS.index(letter)
+        label = onehotencoder(index)
         if self.img_transform:
             image = self.img_transform(image)
-        return image, label0
+        return image, label
