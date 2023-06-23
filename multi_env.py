@@ -1,0 +1,69 @@
+import cv2
+from cvzone.HandTrackingModule import HandDetector
+import time
+import os
+
+import warnings
+import datetime
+import pytz
+
+import config
+
+warnings.filterwarnings(action = "ignore")
+tz_ist = pytz.timezone("Asia/Kolkata")
+ 
+cap = cv2.VideoCapture(0)
+detector = HandDetector(maxHands = 1)
+ 
+imgSize = config.IMG_SIZE
+
+i = 0
+while (i < config.NUM_CLASS):
+    base_letter = config.ALPHABETS[i]
+    folder1 = os.path.join(config.FOLDER_ROOT1, base_letter)
+    folder2 = os.path.join(config.FOLDER_ROOT2, base_letter)
+    i += 1
+
+    print(
+        f'{datetime.datetime.now(tz_ist).strftime("%Y-%m-%d %H:%M:%S")}--[INFO]: Collecting {config.MAXCOUNT_PER_ENV} images for {base_letter}'
+    )
+    counter = 0
+    while (counter < config.MAXCOUNT_PER_ENV):
+        success, img0 = cap.read()
+        hands, img1 = detector.findHands(img0)
+        if hands:
+            hand = hands[0]
+            x, y, w, h = hand['bbox']
+
+            imgCrop_line = img1[y - round(w/2):y + round(w/2) + h, x - round(h/2):x + w + round(h/2)]
+            try:
+                imgResize_line = cv2.resize(imgCrop_line, (imgSize, imgSize))
+                cv2.imshow("ImageCrop_line", imgCrop_line)
+            except:
+                pass
+
+            success, img2 = cap.read()
+            imgCrop_normal = img2[y - round(w/2):y + round(w/2) + h, x - round(h/2):x + w + round(h/2)]
+            try:
+                imgResize_normal = cv2.resize(imgCrop_normal, (imgSize, imgSize))
+                cv2.imshow("ImageCrop_normal", imgCrop_normal)
+            except:
+                pass
+
+
+        cv2.imshow("Image", img1)
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("s"):
+            counter += 1
+            time_param = str(time.time())
+            cv2.imwrite(os.path.join(folder1, 'Image_' + time_param + config.EXTENSION), imgResize_line)
+            cv2.imwrite(os.path.join(folder2, 'Image_' + time_param + config.EXTENSION), imgResize_normal)
+            print(
+                f'{datetime.datetime.now(tz_ist).strftime("%Y-%m-%d %H:%M:%S")}--[INFO]: Count: {counter}'
+            )
+        elif key == 27:
+            break
+    
+
+    cv2.destroyAllWindows()
+cap.release()
