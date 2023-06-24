@@ -45,7 +45,7 @@ while True:
         time_param = str(time.time())
         cv2.imwrite(os.path.join(folder1, 'Image_' + time_param + config.EXTENSION), imgResize_line)
         cv2.imwrite(os.path.join(folder2, 'Image_' + time_param + config.EXTENSION), imgResize_normal)
-        print(counter)
+        print(f"Count of images for the letter {config.BASE_LETTER} : {counter}")
     elif key == 27:
         cap.release()
         break
