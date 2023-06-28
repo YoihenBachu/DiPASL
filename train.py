@@ -22,7 +22,7 @@ if __name__ == "__main__":
     if config.WANDB_LOG == True:
         wandb.init(project = config.WANDB_INIT)
 
-    backbones = config.BACKBONE
+    backbones = config.TRAIN_BACKBONE
     epochs = config.EPOCHS
     lr = config.LEARNING_RATE
     opt_method = config.OPTIMIZER
@@ -34,12 +34,19 @@ if __name__ == "__main__":
     iterable_path = os.path.join(base_dir, "**")
     data_paths = glob.glob(os.path.join(iterable_path, "*" + ext))
 
-    df = make_df(data_paths, config.ALPHABETS)
-    img_transform = transforms.Compose([transforms.ToTensor()])
+    df = make_df(data_paths)
+    img_transform = transforms.Compose(
+        transforms.RandomApply([
+            transforms.RandomAffine(degrees=10, translate=(0.1, 0.1), shear=5),
+            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+            transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 1.0)),
+        ], p=0.6),
+        transforms.ToTensor(),
+    )
 
     train_df, test_df = train_test_split(df, test_size = 0.3, shuffle = True)
-    trainset = ASL_dataset(train_df, img_transform, config.ALPHABETS)
-    testset = ASL_dataset(test_df, img_transform, config.ALPHABETS)
+    trainset = ASL_dataset(train_df, img_transform)
+    testset = ASL_dataset(test_df, img_transform)
     trainloader = DataLoader(trainset, batch_size = config.BATCH_SIZE, drop_last = True)
     testloader = DataLoader(testset, batch_size = config.BATCH_SIZE)
 

@@ -14,7 +14,7 @@ import cv2
 from PIL import Image
 
 NUM_CLASS = 26
-BATCH_SIZE = 32
+BATCH_SIZE = 128
 WEIGHT_DECAY = 0.0001
 alphabets = ['A', 'B', 'C', 'D',
             'E', 'F', 'G', 'H',
@@ -30,7 +30,7 @@ sweep_configuration = {
     "metric": {'goal': 'maximize', 'name': 'Training accuracy'},
     "parameters": {
         "epochs": {"values": [30]},
-        "lr": {"values": [0.001, 0.0001, 0.01]},
+        "lr": {"values": [0.0001, 0.001, 0.01, 0.1]},
         "backbones": {"values": ["resnet18", "mobilenetv2_050.lamb_in1k", "efficientnetv2_rw_m.agc_in1k", "rexnet_100.nav_in1k", "xception41"]},
         "optims": {"values": ["adam", "sgd", "adamw"]},
     },
@@ -221,7 +221,14 @@ def main():
     data_paths = glob.glob(os.path.join(iterable_path, "*" + ext))
 
     df = make_df(data_paths, alphabets)
-    img_transform = transforms.Compose([transforms.ToTensor()])
+    img_transform = transforms.Compose(
+        transforms.RandomApply([
+            transforms.RandomAffine(degrees=10, translate=(0.1, 0.1), shear=5),
+            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+            transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 1.0)),
+        ], p=0.6),
+        transforms.ToTensor(),
+    )
 
     train_df, test_df = train_test_split(df, test_size = 0.3, shuffle = True)
     trainset = ASL_dataset(train_df, img_transform, alphabets)
