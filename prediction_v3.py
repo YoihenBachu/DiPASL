@@ -35,7 +35,16 @@ if __name__ == "__main__":
     weight_path = args.weight_path
     backbone = args.backbone
 
-    img_transform = transforms.Compose([transforms.ToTensor()])
+    if config.DATASET_TYPE == "line_plotted":
+        MEAN = [0.5172, 0.4853, 0.4789]
+        STD = [0.2236, 0.2257, 0.2162]
+    else:
+        MEAN = [0.5016, 0.4767, 0.4698]
+        STD = [0.2130, 0.2169, 0.2069]
+    img_transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=MEAN, std=STD),
+    ])
 
     cap = cv2.VideoCapture(0)
 

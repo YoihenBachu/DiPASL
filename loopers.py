@@ -86,9 +86,9 @@ def looper(epochs,
         test_acc = accuracy_score(test_labels, test_predictions)
         test_loss = test_loss / len(testloader)
 
-        filename = str(bname) + '_' + str(optim) + '_' + str(lr) + '_' + str(epoch) + '.pt'
+        filename = str(bname) + '_' + str(optim) + '_' + str(lr) + '_' + str(epoch+1) + '.pt'
         if wandb_log:
-            if ((e) >= 20) and ((e)%5 == 0):
+            if ((e) >= 15) and ((e)%5 == 0):
                 torch.save(model.state_dict(), os.path.join(model_savepath, str(filename)))
                 wandb.alert(
                     title = 'Update',
@@ -101,7 +101,7 @@ def looper(epochs,
             )
 
         else:
-            if ((e) >= 20) and ((e)%5 == 0):
+            if ((e) >= 15) and ((e)%5 == 0):
                 torch.save(model.state_dict(), os.path.join(model_savepath, str(filename)))
                 
         # Print the training and testing statistics

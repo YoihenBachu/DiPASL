@@ -9,6 +9,7 @@ ALPHABETS = ['A', 'B', 'C', 'D',
             'U', 'V', 'W', 'X',
             'Y', 'Z']
 EXTENSION = '.png'
+DATASET_TYPE = "line_plotted" # select from [line_plotted, traditional]
 
 # preprocessing parameters
 FOLDER_ROOT1 = r'D:\final_year_project\dataset1'

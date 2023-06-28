@@ -221,15 +221,17 @@ def main():
     data_paths = glob.glob(os.path.join(iterable_path, "*" + ext))
 
     df = make_df(data_paths, alphabets)
-    img_transform = transforms.Compose(
+    img_transform = transforms.Compose([
         transforms.RandomApply([
             transforms.RandomAffine(degrees=10, translate=(0.1, 0.1), shear=5),
             transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
             transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 1.0)),
         ], p=0.6),
         transforms.ToTensor(),
-    )
-
+        transforms.Normalize(mean = [0.5172, 0.4853, 0.4789], # use [0.5016, 0.4767, 0.4698] for DATASET_TYPE "traditional"
+                            std = [0.2236, 0.2257, 0.2162]), # use [0.2130, 0.2169, 0.2069] for DATASET_TYPE "traditional"
+    ])
+    
     train_df, test_df = train_test_split(df, test_size = 0.3, shuffle = True)
     trainset = ASL_dataset(train_df, img_transform, alphabets)
     testset = ASL_dataset(test_df, img_transform, alphabets)
