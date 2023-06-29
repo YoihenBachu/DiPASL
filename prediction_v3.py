@@ -19,7 +19,8 @@ if __name__ == "__main__":
         "--weight_path",
         "-w",
         type=str,
-        required=True,
+        default=config.WEIGHT_PATH,
+        required=False,
         help="path of the weight that is supposed to be loaded for prediction",
     )
 
@@ -27,7 +28,8 @@ if __name__ == "__main__":
         "--backbone",
         "-b",
         type=str,
-        required=True,
+        default=config.PREDICT_BACKBONE,
+        required=False,
         help="backbone of the model architecture that is to be used for prediction",
     )
 

@@ -14,7 +14,7 @@ import cv2
 from PIL import Image
 
 NUM_CLASS = 26
-BATCH_SIZE = 128
+BATCH_SIZE = 32
 WEIGHT_DECAY = 0.0001
 alphabets = ['A', 'B', 'C', 'D',
             'E', 'F', 'G', 'H',
@@ -31,7 +31,7 @@ sweep_configuration = {
     "parameters": {
         "epochs": {"values": [30]},
         "lr": {"values": [0.0001, 0.001, 0.01, 0.1]},
-        "backbones": {"values": ["resnet18", "mobilenetv2_050.lamb_in1k", "efficientnetv2_rw_m.agc_in1k", "rexnet_100.nav_in1k", "xception41"]},
+        "backbones": {"values": ["resnet18", "mobilenetv2_050", "efficientnetv2_rw_m", "rexnet_100", "xception41"]},
         "optims": {"values": ["adam", "sgd", "adamw"]},
     },
 }
@@ -50,19 +50,29 @@ def initialize_optimizer(opt_method, model, lr):
     
 def initialize_model(backbone, device):
     if backbone == 'resnet18':
-        model = timm.create_model(backbone, pretrained=True)
-        num_ftrs = model.fc.in_features
-        model.fc = nn.Linear(num_ftrs, NUM_CLASS)
-        model = model.to(device)
-    elif backbone == 'xception41':
-        original_model = timm.create_model(backbone, pretrained=True)
-        original_model.add_module('fc', nn.Linear(2048, NUM_CLASS))
+        original_model = timm.create_model('resnet18', pretrained=True)
+        num_features = original_model.fc.in_features
+        original_model.fc = nn.Linear(num_features, NUM_CLASS)
         model = original_model.to(device)
+        
+    elif backbone == 'xception41':
+        original_model = timm.create_model('xception41', pretrained=True)
+        num_features = original_model.head.fc.in_features
+        original_model.head.fc = nn.Linear(num_features, NUM_CLASS)
+        model = original_model.to(device)
+        
+    elif backbone == 'rexnet_100':
+        original_model = timm.create_model(backbone, pretrained=True)
+        original_model.global_pool = nn.AdaptiveAvgPool2d(1)
+        num_features = original_model.head.fc.in_features
+        original_model.head.fc = nn.Linear(num_features, NUM_CLASS)
+        model = original_model.to(device)
+        
     else:
         original_model = timm.create_model(backbone, pretrained=True)
-        original_model.add_module('fc', nn.Linear(1000, NUM_CLASS))
+        num_features = original_model.classifier.in_features
+        original_model.classifier = nn.Linear(num_features, NUM_CLASS)
         model = original_model.to(device)
-
     return model
     
 def onehotencoder(value):
@@ -259,5 +269,5 @@ def main():
     
     torch.cuda.empty_cache()
 
-wandb.agent(sweep_id, main, count=45)
+wandb.agent(sweep_id, main, count=60)
 wandb.finish()

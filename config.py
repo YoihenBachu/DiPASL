@@ -28,8 +28,10 @@ OPTIMIZER = "adam"
 TRANSFER = True
 
 # Prediction parameters
-PREDICT_BACKBONE = "efficientnetv2_rw_m.agc_in1k"
-WEIGHT_PATH = r'F:\fyp\new_weights\weight1\efficientnetv2_rw_m.agc_in1k_adamw_0.001_25.pt'
+# PREDICT_BACKBONE = "efficientnetv2_rw_m.agc_in1k"
+# WEIGHT_PATH = r'F:\fyp\new_weights\weight1\efficientnetv2_rw_m.agc_in1k_adamw_0.001_25.pt'
+PREDICT_BACKBONE = "xception41"
+WEIGHT_PATH = r"D:\final_year_project\weights2\fearless sweep-1\xception41_24.pt"
 
 # Other configurations
 SAVE_CSV = False
