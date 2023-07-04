@@ -13,7 +13,6 @@ def onehotencoder(value):
     one_hot_vector = np.zeros(config.NUM_CLASS)
     one_hot_vector[value] = 1
     one_hot_vector = one_hot_vector.astype(int)
-
     return one_hot_vector
 
 def make_df(all_path):
@@ -28,6 +27,21 @@ def make_df(all_path):
             c+=1
     return df
 
+def generate_backbone_name(input_string):
+    backbone_name = input_string.lower()
+    if "resnet" in backbone_name:
+        return "resnet18"
+    elif "xception" in backbone_name:
+        return "xception41"
+    elif "rexnet" in backbone_name:
+        return "rexnet_100"
+    elif "efficientnet" in backbone_name:
+        return "efficientnetv2_rw_m"
+    elif "mobilenet" in backbone_name:
+        return "mobilenetv2_050"
+    else:
+        return "Unidentified backbone name, pick from the following [resnet, mobilenet, efficientnet, xception, rexnet]"
+
 def initialize_optimizer(opt_method, model, lr):
     if opt_method == "adam":
         return torch.optim.Adam(model.parameters(), lr=lr, weight_decay=config.WEIGHT_DECAY)
@@ -37,47 +51,73 @@ def initialize_optimizer(opt_method, model, lr):
         return torch.optim.SGD(
             model.parameters(), lr=lr, weight_decay=config.WEIGHT_DECAY, nesterov=True, momentum = 0.9
         )
-    
+
 def initialize_model(backbone, device, transfer):
     if backbone == 'resnet18':
         if transfer == True:
-            original_model = timm.create_model(backbone, pretrained=True)
+            original_model = timm.create_model('resnet18', pretrained=True)
         else:
-            original_model = timm.create_model(backbone, pretrained=False)
-        num_ftrs = original_model.fc.in_features
-        original_model.fc = nn.Linear(num_ftrs, config.NUM_CLASS)
+            original_model = timm.create_model('resnet18', pretrained=False)
+        num_features = original_model.fc.in_features
+        original_model.fc = nn.Linear(num_features, config.NUM_CLASS)
         model = original_model.to(device)
+        
     elif backbone == 'xception41':
         if transfer == True:
-            original_model = timm.create_model(backbone, pretrained=True)
+            original_model = timm.create_model('xception41', pretrained=True)
         else:
-            original_model = timm.create_model(backbone, pretrained=False)
-        original_model.add_module('fc', nn.Linear(2048, config.NUM_CLASS))
+            original_model = timm.create_model('xception41', pretrained=False)
+        num_features = original_model.head.fc.in_features
+        original_model.head.fc = nn.Linear(num_features, config.NUM_CLASS)
         model = original_model.to(device)
+        
+    elif backbone == 'rexnet_100':
+        if transfer == True:
+            original_model = timm.create_model('rexnet_100', pretrained=True)
+        else:
+            original_model = timm.create_model('rexnet_100', pretrained=False)
+        original_model.global_pool = nn.AdaptiveAvgPool2d(1)
+        num_features = original_model.head.fc.in_features
+        original_model.head.fc = nn.Linear(num_features, config.NUM_CLASS)
+        model = original_model.to(device)
+        
     else:
         if transfer == True:
-            original_model = timm.create_model(backbone, pretrained=True)
+            original_model = timm.create_model('rexnet_100', pretrained=True)
         else:
-            original_model = timm.create_model(backbone, pretrained=False)
-        original_model.add_module('fc', nn.Linear(1000, config.NUM_CLASS))
+            original_model = timm.create_model('rexnet_100', pretrained=False)
+        num_features = original_model.classifier.in_features
+        original_model.classifier = nn.Linear(num_features, config.NUM_CLASS)
         model = original_model.to(device)
     return model
-
-def load_model(backbone, weight):
+    
+def load_model(backbone, weight, device):
     if backbone == 'resnet18':
-        model = timm.create_model(backbone, pretrained=True)
-        num_ftrs = model.fc.in_features
-        model.fc = nn.Linear(num_ftrs, config.NUM_CLASS)
-        model.load_state_dict(torch.load(weight))
-
+        original_model = timm.create_model('resnet18', pretrained=True)
+        num_features = original_model.fc.in_features
+        original_model.fc = nn.Linear(num_features, config.NUM_CLASS)
+        original_model.load_state_dict(torch.load(weight, map_location=device))
+        model = original_model.to(device)
+        
     elif backbone == 'xception41':
-        model = timm.create_model(backbone, pretrained=True)
-        model.add_module('fc', nn.Linear(2048, config.NUM_CLASS))
-        model.load_state_dict(torch.load(weight))
-
+        original_model = timm.create_model('xception41', pretrained=True)
+        num_features = original_model.head.fc.in_features
+        original_model.head.fc = nn.Linear(num_features, config.NUM_CLASS)
+        original_model.load_state_dict(torch.load(weight, map_location=device))
+        model = original_model.to(device)
+        
+    elif backbone == 'rexnet_100':
+        original_model = timm.create_model(backbone, pretrained=True)
+        original_model.global_pool = nn.AdaptiveAvgPool2d(1)
+        num_features = original_model.head.fc.in_features
+        original_model.head.fc = nn.Linear(num_features, config.NUM_CLASS)
+        original_model.load_state_dict(torch.load(weight, map_location=device))
+        model = original_model.to(device)
+        
     else:
-        model = timm.create_model(backbone, pretrained=True)
-        model.add_module('fc', nn.Linear(1000, config.NUM_CLASS))
-        model.load_state_dict(torch.load(weight))
-
+        original_model = timm.create_model(backbone, pretrained=True)
+        num_features = original_model.classifier.in_features
+        original_model.classifier = nn.Linear(num_features, config.NUM_CLASS)
+        original_model.load_state_dict(torch.load(weight, map_location = device))
+        model = original_model.to(device)
     return model

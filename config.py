@@ -9,7 +9,8 @@ ALPHABETS = ['A', 'B', 'C', 'D',
             'U', 'V', 'W', 'X',
             'Y', 'Z']
 EXTENSION = '.png'
-DATASET_TYPE = "line_plotted" # select from [line_plotted, traditional]
+DATASET_TYPE = "skeleton" # select from [skeleton, traditional]
+SAVE_CSV = False 
 
 # preprocessing parameters
 FOLDER_ROOT1 = r'D:\final_year_project\dataset1'
@@ -18,23 +19,21 @@ BASE_LETTER = 'R'
 MAXCOUNT_PER_ENV = 75
 
 # Training parameters
-BATCH_SIZE = 64
+BATCH_SIZE = 32
 EPOCHS = 30
 MOMENTUM = 0.9
 LEARNING_RATE = 0.001
 WEIGHT_DECAY = 0.0001
-TRAIN_BACKBONE = "resnet18"
-OPTIMIZER = "adam"
-TRANSFER = True
+TRAIN_BACKBONE = "resnet" # select from [resnet, mobilenet, efficientnet, xception, rexnet]
+OPTIMIZER = "adam" # select from [adam, adamw, sgd]
+TRANSFER = True 
+DATASET_PATH = r'F:\fyp\dataset'
+MODEL_SAVEPATH = r'F:\fyp'
 
 # Prediction parameters
-# PREDICT_BACKBONE = "efficientnetv2_rw_m.agc_in1k"
-# WEIGHT_PATH = r'F:\fyp\new_weights\weight1\efficientnetv2_rw_m.agc_in1k_adamw_0.001_25.pt'
-PREDICT_BACKBONE = "xception41"
-WEIGHT_PATH = r"D:\final_year_project\weights2\fearless sweep-1\xception41_24.pt"
-
-# Other configurations
-SAVE_CSV = False
+REAL_TIME_BACKBONE = "mobilenet" # select from [resnet, mobilenet, efficientnet, xception, rexnet]
+S900_WEIGHT = 'checkpoints/DiPASL_S900/mobilenetv2_050_adamw_0.001_25.pt'
+T900_WEIGHT = 'checkpoints/DiPASL_T900/mobilenetv2_050_sgd_0.01_25.pt'
 
 # Wandb parameters
 WANDB_INIT = 'DiPASL Single Training'

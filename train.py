@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 import os, glob
 import wandb
 import warnings
+import argparse
 
 from utils import *
 from dataset import ASL_dataset
@@ -16,10 +17,30 @@ import config
 warnings.filterwarnings(action = "ignore")
         
 if __name__ == "__main__":
-    base_dir = r'F:\fyp\dataset'
-    model_savepath = r'F:\fyp'
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--dataset_dir",
+        "-d",
+        type=str,
+        default=config.DATASET_PATH,
+        required=False,
+        help="folder directory of the dataset, it should follow the directory structure and should contain NUM_CLASS subfolders"
+    )
+
+    parser.add_argument(
+        "--model_saving_path",
+        "-m",
+        type=str,
+        default=config.MODEL_SAVEPATH,
+        required=False,
+        help="path of the folder where trained models are to be saved"
+    )
+
+    args = parser.parse_args()
+    base_dir = args.dataset_dir
+    model_savepath = args.model_saving_path
     
-    if config.DATASET_TYPE == "line_plotted":
+    if config.DATASET_TYPE == "skeleton":
         MEAN = [0.5172, 0.4853, 0.4789]
         STD = [0.2236, 0.2257, 0.2162]
     else:
@@ -29,7 +50,8 @@ if __name__ == "__main__":
     if config.WANDB_LOG == True:
         wandb.init(project = config.WANDB_INIT)
 
-    backbones = config.TRAIN_BACKBONE
+    backbone_name = config.TRAIN_BACKBONE
+    backbone = generate_backbone_name(backbone_name)
     epochs = config.EPOCHS
     lr = config.LEARNING_RATE
     opt_method = config.OPTIMIZER
@@ -58,11 +80,10 @@ if __name__ == "__main__":
     trainloader = DataLoader(trainset, batch_size = config.BATCH_SIZE, drop_last = True)
     testloader = DataLoader(testset, batch_size = config.BATCH_SIZE)
 
-    model = initialize_model(backbones, device, transfer = config.TRANSFER)
+    model = initialize_model(backbone, device, transfer = config.TRANSFER)
     optimizer = initialize_optimizer(opt_method, model, lr)
     loss_fn = nn.CrossEntropyLoss()
 
-    bname = str(backbones)
     wandb_log = config.WANDB_LOG
     looper(epochs,
            optimizer,
@@ -73,6 +94,6 @@ if __name__ == "__main__":
            device,
            wandb_log,
            model_savepath,
-           bname,
+           backbone,
            opt_method,
            lr)
