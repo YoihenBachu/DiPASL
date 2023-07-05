@@ -1,4 +1,4 @@
-# DiPASL: the Different Perspective ASL
+# DiPASL: The Different Perspective ASL
 
 This page is dedicated to tackle the problem that arises from developing a friendly device that can recognise
 hand sign languages from the first-person perspective or in simpler terms, the ability to recognise the hand
@@ -45,15 +45,16 @@ It doesn't need you to change your directory. But to run codes, you must change 
 To change your working directory, follow step 1.
 
 #### 3. Setting up requirements
+You will find *requirements.txt* among the cloned files in the working directory.
+If you are already in the working directory, ignore. Else, go to working directory. 
 Install the pre-requisite libraries by using the command
 ```
-pip install requirement.txt
+pip install requirements.txt
 ```
 
 #### 4. Library manipulations
-Go to the HandTrackingModule.py in the cvzone package.
-Under the HandDetector class, a method named findHands() will be found
-Comment out or Delete line 91 to 94.
+Go to the ***HandTrackingModule.py*** in the cvzone package.
+Under the ***HandDetector*** class, comment out or delete *line 91 to 94* in the ***findHands()*** method.\
 **This is necessary to put skeleton maps in the detected hands and not bounding boxes**
 
 
