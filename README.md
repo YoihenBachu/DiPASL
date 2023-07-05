@@ -12,21 +12,21 @@ get the datasets or collect your own datasets in the system that we propose to s
 
 1. First clone the repository in your local or cloud workspace by using the command below
 
-'''
+```
 git clone https://github.com/YoihenBachu/DiPASL.git
-'''
+```
 
 1. Create a new environment in your conda terminal
 
-'''
+```
 conda create --name DiPASL python=3.8
-'''
+```
 You can also use python 3.9 or 3.10
 
 1. Install the pre-requisite libraries by using the command
 
-'''
+```
 pip install requirement.txt
-'''
+```
 
 1. Remove this two lines from the cvzone.findhands() module
