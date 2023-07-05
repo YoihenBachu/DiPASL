@@ -1,4 +1,4 @@
-# DiPASL the Different Perspective ASL
+# DiPASL: the Different Perspective ASL
 
 This page is dedicated to tackle the problem that arises from developing a friendly device that can recognise
 hand sign languages from the first-person perspective or in simpler terms, the ability to recognise the hand
@@ -10,23 +10,51 @@ get the datasets or collect your own datasets in the system that we propose to s
 
 ## Setup
 
-1. First clone the repository in your local or cloud workspace by using the command below
-
+#### 1. Getting the codes
+Go to the directory that you want to place the codes
+This can be done by following the steps below
+```
+E:
+cd <path to working directory>
+```
+This considers your working directory to be in E-drive, you can set it as you want.
+Clone the repository in your local or cloud workspace (working directory) by using the command below
 ```
 git clone https://github.com/YoihenBachu/DiPASL.git
 ```
 
-1. Create a new environment in your conda terminal
-
+#### 2. Creating conda environment
+Create a new environment in your conda terminal
 ```
 conda create --name DiPASL python=3.8
 ```
 You can also use python 3.9 or 3.10
 
-1. Install the pre-requisite libraries by using the command
+Go to the environment by using
+```
+conda activate DiPASL
+```
+You can also de-activate the environment by using 
+```
+conda deactivate DiPASL
+```
 
+Once inside the working environment, you can install the requirements given below. 
+Note that installing requirements only needs you to be in the conda environment you want to work with
+It doesn't need you to change your directory. But to run codes, you must change your working directory.
+To change your working directory, follow step 1.
+
+#### 3. Setting up requirements
+Install the pre-requisite libraries by using the command
 ```
 pip install requirement.txt
 ```
 
-1. Remove this two lines from the cvzone.findhands() module
+#### 4. Library manipulations
+Go to the HandTrackingModule.py in the cvzone package.
+Under the HandDetector class, a method named findHands() will be found
+Comment out or Delete line 91 to 94.
+**This is necessary to put skeleton maps in the detected hands and not bounding boxes**
+
+
+
