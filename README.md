@@ -57,5 +57,18 @@ Go to the ***HandTrackingModule.py*** in the cvzone package.
 Under the ***HandDetector*** class, comment out or delete *line 91 to 94* in the ***findHands()*** method.\
 **This is necessary to put skeleton maps in the detected hands and not bounding boxes**
 
+## Data acquisition
+
+You can either start from scratch or use our datasets DiPASL-S900 and DiPASL-T900 to do your works
+or experiments. The two approaches differs largely as for the first one, additional codes has to be run.\
+\
+### Start from Scratch
+#### 1. Configure settings
+In the config.py, we have to make changes to MAXCOUNT_PER_ENV which sets the maximum number of images
+that can be taken from a single environment. Also, you have to set the folders for both the datasets where
+corresponding images has to be stored.
+```
+run python multi_env.py
+```
 
 

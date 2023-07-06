@@ -35,6 +35,9 @@ REAL_TIME_BACKBONE = "mobilenet" # select from [resnet, mobilenet, efficientnet,
 S900_WEIGHT = 'checkpoints/DiPASL_S900/mobilenetv2_050_adamw_0.001_25.pt'
 T900_WEIGHT = 'checkpoints/DiPASL_T900/mobilenetv2_050_sgd_0.01_25.pt'
 
+# S900_WEIGHT = r"D:\final_year_project\checkpoints\DiPASL-S900\efficientnetv2_rw_m_sgd_0.001_25.pt"
+# T900_WEIGHT = r"D:\final_year_project\checkpoints\DiPASL-T900\efficientnetv2_rw_m_adamw_0.0001_25.pt"
+
 # Wandb parameters
 WANDB_INIT = 'DiPASL Single Training'
 WANDB_LOG = True

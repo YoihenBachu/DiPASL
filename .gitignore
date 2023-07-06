@@ -1,0 +1,10 @@
+__pycache__/
+
+# Ignore checkpoints
+.ipynb_checkpoints
+
+# Python files
+*.pt
+*.out
+# Workspace
+*.code-workspace
