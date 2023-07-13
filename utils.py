@@ -121,3 +121,26 @@ def load_model(backbone, weight, device):
         original_model.load_state_dict(torch.load(weight, map_location = device))
         model = original_model.to(device)
     return model
+
+def generate_gradcam_layer(model, backbone):
+    if backbone == 'rexnet_100':
+        layer = [list(model.children())[1][-2].conv_exp.conv,
+                 list(model.children())[1][-2].conv_dw.conv,
+                 list(model.children())[1][-2].conv_pwl.conv,
+                 list(model.children())[1][-1].conv]
+    elif backbone == 'resnet18':
+        layer = [model.layer4[0].conv1,
+                 model.layer4[0].conv2,
+                 model.layer4[-1].conv1,
+                 model.layer4[-1].conv2]
+    elif backbone == 'xception41':
+        layer = [model.blocks[-1].stack.conv2.conv_dw,
+                 model.blocks[-1].stack.conv2.conv_pw,
+                 model.blocks[-1].stack.conv3.conv_dw,
+                 model.blocks[-1].stack.conv3.conv_pw]
+    else:
+        layer = [model.blocks[-1][-1].conv_pw,
+                 model.blocks[-1][-1].conv_dw,
+                 model.blocks[-1][-1].conv_pwl,
+                 model.conv_head]
+    return layer
