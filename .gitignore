@@ -10,7 +10,6 @@ __pycache__/
 *.yaml
 *.json
 *.cpython
-*.__pycache__
 
 # Python files
 *.pt
