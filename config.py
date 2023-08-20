@@ -22,13 +22,13 @@ MAXCOUNT_PER_ENV = 75
 BATCH_SIZE = 32
 EPOCHS = 30
 MOMENTUM = 0.9
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.0001
 WEIGHT_DECAY = 0.0001
-TRAIN_BACKBONE = "resnet" # select from [resnet, mobilenet, efficientnet, xception, rexnet]
-OPTIMIZER = "adam" # select from [adam, adamw, sgd]
+TRAIN_BACKBONE = "mobilenet" # select from [resnet, mobilenet, efficientnet, xception, rexnet]
+OPTIMIZER = "adamw" # select from [adam, adamw, sgd]
 TRANSFER = True 
-DATASET_PATH = r'F:\fyp\dataset'
-MODEL_SAVEPATH = r'F:\fyp'
+DATASET_PATH = r'D:\final_year_project\dataset_900\DiPASL-S900'
+MODEL_SAVEPATH = r'D:\final_year_project\weights2\single_train'
 
 # Prediction parameters
 REAL_TIME_BACKBONE = "mobilenet" # select from [resnet, mobilenet, efficientnet, xception, rexnet]

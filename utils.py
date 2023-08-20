@@ -55,27 +55,27 @@ def initialize_optimizer(opt_method, model, lr):
 def initialize_model(backbone, device, transfer):
     if backbone == 'resnet18':
         if transfer == True:
-            original_model = timm.create_model('resnet18', pretrained=True)
+            original_model = timm.create_model(backbone, pretrained=True)
         else:
-            original_model = timm.create_model('resnet18', pretrained=False)
+            original_model = timm.create_model(backbone, pretrained=False)
         num_features = original_model.fc.in_features
         original_model.fc = nn.Linear(num_features, config.NUM_CLASS)
         model = original_model.to(device)
         
     elif backbone == 'xception41':
         if transfer == True:
-            original_model = timm.create_model('xception41', pretrained=True)
+            original_model = timm.create_model(backbone, pretrained=True)
         else:
-            original_model = timm.create_model('xception41', pretrained=False)
+            original_model = timm.create_model(backbone, pretrained=False)
         num_features = original_model.head.fc.in_features
         original_model.head.fc = nn.Linear(num_features, config.NUM_CLASS)
         model = original_model.to(device)
         
     elif backbone == 'rexnet_100':
         if transfer == True:
-            original_model = timm.create_model('rexnet_100', pretrained=True)
+            original_model = timm.create_model(backbone, pretrained=True)
         else:
-            original_model = timm.create_model('rexnet_100', pretrained=False)
+            original_model = timm.create_model(backbone, pretrained=False)
         original_model.global_pool = nn.AdaptiveAvgPool2d(1)
         num_features = original_model.head.fc.in_features
         original_model.head.fc = nn.Linear(num_features, config.NUM_CLASS)
@@ -83,9 +83,9 @@ def initialize_model(backbone, device, transfer):
         
     else:
         if transfer == True:
-            original_model = timm.create_model('rexnet_100', pretrained=True)
+            original_model = timm.create_model(backbone, pretrained=True)
         else:
-            original_model = timm.create_model('rexnet_100', pretrained=False)
+            original_model = timm.create_model(backbone, pretrained=False)
         num_features = original_model.classifier.in_features
         original_model.classifier = nn.Linear(num_features, config.NUM_CLASS)
         model = original_model.to(device)
@@ -93,14 +93,14 @@ def initialize_model(backbone, device, transfer):
     
 def load_model(backbone, weight, device):
     if backbone == 'resnet18':
-        original_model = timm.create_model('resnet18', pretrained=True)
+        original_model = timm.create_model(backbone, pretrained=True)
         num_features = original_model.fc.in_features
         original_model.fc = nn.Linear(num_features, config.NUM_CLASS)
         original_model.load_state_dict(torch.load(weight, map_location=device))
         model = original_model.to(device)
         
     elif backbone == 'xception41':
-        original_model = timm.create_model('xception41', pretrained=True)
+        original_model = timm.create_model(backbone, pretrained=True)
         num_features = original_model.head.fc.in_features
         original_model.head.fc = nn.Linear(num_features, config.NUM_CLASS)
         original_model.load_state_dict(torch.load(weight, map_location=device))
@@ -122,25 +122,36 @@ def load_model(backbone, weight, device):
         model = original_model.to(device)
     return model
 
+# def generate_gradcam_layer(model, backbone):
+#     if backbone == 'rexnet_100':
+#         layer = [list(model.children())[1][-2].conv_exp.conv,
+#                  list(model.children())[1][-2].conv_dw.conv,
+#                  list(model.children())[1][-2].conv_pwl.conv,
+#                  list(model.children())[1][-1].conv]
+#     elif backbone == 'resnet18':
+#         layer = [model.layer4[0].conv1,
+#                  model.layer4[0].conv2,
+#                  model.layer4[-1].conv1,
+#                  model.layer4[-1].conv2]
+#     elif backbone == 'xception41':
+#         layer = [model.blocks[-1].stack.conv2.conv_dw,
+#                  model.blocks[-1].stack.conv2.conv_pw,
+#                  model.blocks[-1].stack.conv3.conv_dw,
+#                  model.blocks[-1].stack.conv3.conv_pw]
+#     else:
+#         layer = [model.blocks[-1][-1].conv_pw,
+#                  model.blocks[-1][-1].conv_dw,
+#                  model.blocks[-1][-1].conv_pwl,
+#                  model.conv_head]
+#     return layer
+
 def generate_gradcam_layer(model, backbone):
     if backbone == 'rexnet_100':
-        layer = [list(model.children())[1][-2].conv_exp.conv,
-                 list(model.children())[1][-2].conv_dw.conv,
-                 list(model.children())[1][-2].conv_pwl.conv,
-                 list(model.children())[1][-1].conv]
+        layer = [list(model.children())[1][-1].conv]
     elif backbone == 'resnet18':
-        layer = [model.layer4[0].conv1,
-                 model.layer4[0].conv2,
-                 model.layer4[-1].conv1,
-                 model.layer4[-1].conv2]
+        layer = [model.layer4[-1].conv2]
     elif backbone == 'xception41':
-        layer = [model.blocks[-1].stack.conv2.conv_dw,
-                 model.blocks[-1].stack.conv2.conv_pw,
-                 model.blocks[-1].stack.conv3.conv_dw,
-                 model.blocks[-1].stack.conv3.conv_pw]
+        layer = [model.blocks[-1].stack.conv3.conv_pw]
     else:
-        layer = [model.blocks[-1][-1].conv_pw,
-                 model.blocks[-1][-1].conv_dw,
-                 model.blocks[-1][-1].conv_pwl,
-                 model.conv_head]
+        layer = [model.conv_head]
     return layer

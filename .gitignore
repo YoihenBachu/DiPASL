@@ -3,6 +3,15 @@ __pycache__/
 # Ignore checkpoints
 .ipynb_checkpoints
 
+# others
+*.pyc
+*.log
+*.wandb
+*.yaml
+*.json
+*.cpython
+*.__pycache__
+
 # Python files
 *.pt
 *.out

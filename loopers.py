@@ -22,7 +22,6 @@ def looper(epochs,
 ):
     e = 0
     for epoch in range(epochs):
-        e += 1
         print('Epoch {}/{}, lr:{}'.format(epoch + 1, epochs, optimizer.param_groups[0]['lr']))
         print('-' * 30)
         # Train the model
@@ -88,7 +87,7 @@ def looper(epochs,
 
         filename = str(bname) + '_' + str(optim) + '_' + str(lr) + '_' + str(epoch+1) + '.pt'
         if wandb_log:
-            if ((e) >= 15) and ((e)%5 == 0):
+            if ((e)%5 == 0):
                 torch.save(model.state_dict(), os.path.join(model_savepath, str(filename)))
                 wandb.alert(
                     title = 'Update',
@@ -101,9 +100,10 @@ def looper(epochs,
             )
 
         else:
-            if ((e) >= 15) and ((e)%5 == 0):
+            if ((e)%5 == 0):
                 torch.save(model.state_dict(), os.path.join(model_savepath, str(filename)))
                 
+        e += 1
         # Print the training and testing statistics
         print('Epoch [{}/{}], Train Loss: {:.4f}, Train Acc: {:.2f}%, Test Loss: {:.4f}, Test Acc: {:.2f}%'
-            .format(epoch+1, epochs, train_loss, train_acc, test_loss, test_acc))
+            .format(epoch+1, epochs, train_loss, train_acc*100, test_loss, test_acc*100))
